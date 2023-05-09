@@ -7,7 +7,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import net.takagisou.bottomnavigationviewwithstate.databinding.FragmentHomeBinding
+import net.takagisou.bottomnavigationviewwithstate.databinding.ItemHomeBinding
 
 class HomeFragment : Fragment() {
 
@@ -28,10 +31,14 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        val items = mutableListOf<String>()
+        (0..30).forEach {
+            items.add("${it}番目のアイテム")
         }
+        binding.recyclerview.setHasFixedSize(true)
+        binding.recyclerview.adapter = HomeAdapter(items.toTypedArray())
+        binding.recyclerview.layoutManager = LinearLayoutManager(root.context)
+
         return root
     }
 
@@ -39,4 +46,25 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+}
+
+class HomeAdapter(private val items: Array<String>): RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
+    class  ViewHolder(private val binding: ItemHomeBinding): RecyclerView.ViewHolder(binding.root) {
+        fun setup(text: String) {
+            binding.textview.text = text
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemHomeBinding.inflate(inflater, parent, false)
+        return ViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val text = items[position]
+        holder.setup(text)
+    }
+
+    override fun getItemCount(): Int = items.size
 }
